@@ -1,0 +1,33 @@
+# Imagem base do Node
+FROM node:23
+
+# Variável de ambiente para o ambiente de desenvolvimento
+ARG ENV
+ENV ENV=${ENV}
+
+# Diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copia os arquivos de configuração primeiro para cache otimizado
+COPY package.json yarn.lock*
+
+# Instala as dependências
+RUN yarn install
+
+# Copia os arquivos do repositório para o diretório de trabalho
+COPY . .
+
+#Copia o arquivo de env do ambiente
+COPY .env.homol .env
+
+# Gera o arquivo de configuração do Prisma
+RUN yarn prisma generate
+
+#Gera o build do projeto
+RUN yarn build
+
+# Expoe a porta 3000
+EXPOSE 3000
+
+# Comando para iniciar o servidor
+CMD ["yarn", "start:prod"]
