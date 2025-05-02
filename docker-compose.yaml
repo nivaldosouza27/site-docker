@@ -51,7 +51,7 @@ services:
     container_name: phpmyadmin-${ENV}
     restart: always
     ports:
-      - "5051:8080"
+      - "5051:80"
     environment:
       PMA_HOSTS: db-dash-${ENV},db-manager-${ENV},db-site-${ENV}
       PMA_USER: root
