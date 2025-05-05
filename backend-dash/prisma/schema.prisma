@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TesteBancoSite {
+model TesteTabelaDash {
   id        Int      @id @default(autoincrement())
   nome      String
   createdAt DateTime @default(now())

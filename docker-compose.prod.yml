@@ -1,0 +1,115 @@
+networks:
+  app_net:
+    driver: bridge
+
+services:
+  db-main:
+    build:
+      context: ./db-main
+      dockerfile: Dockerfile
+      args:
+        ENV: prod
+    container_name: db-main-prod
+    env_file: ./.env.dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbmain-prod-data:/var/lib/mysql
+    networks:
+      - app_net
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin-prod
+    restart: always
+    ports:
+      - "5051:80"
+    environment:
+      PMA_HOST: db-main-prod
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db-main
+    networks:
+      - app_net
+
+  api-dash:
+    build:
+      context: ./api-dash
+      dockerfile: ./Docker/Dockerfile.prod
+      args:
+        ENV: prod
+    container_name: api-dash
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db-main
+    networks:
+      - app_net
+
+  api-manager:
+    build:
+      context: ./api-manager
+      dockerfile: ./Docker/Dockerfile.prod
+      args:
+        ENV: prod
+    container_name: api-manager
+    ports:
+      - "3002:3000"
+    depends_on:
+      - db-main
+    networks:
+      - app_net
+
+  api-site:
+    build:
+      context: ./api-site
+      dockerfile: ./Docker/Dockerfile.prod
+      args:
+        ENV: prod
+    container_name: api-site
+    ports:
+      - "3003:3000"
+    depends_on:
+      - db-main
+    networks:
+      - app_net
+
+  front-dash:
+    build:
+      context: ./front-dash
+      dockerfile: ./Docker/Dockerfile.prod
+      args:
+        ENV: prod
+    container_name: front-dash
+    ports:
+      - "3020:3000"
+    volumes:
+      - ./front-dash:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - api-dash
+    networks:
+      - app_net
+
+  front-site:
+    build:
+      context: ./front-site
+      dockerfile: ./Docker/Dockerfile.prod
+      args:
+        ENV: prod
+    container_name: front-site
+    ports:
+      - "3021:3000"
+    volumes:
+      - ./front-site:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - api-site
+    networks:
+      - app_net
+
+volumes:
+  dbmain-prod-data:

@@ -26,31 +26,32 @@ help:
 
 define compose_up
 	@echo "✅ Subindo todos os containers: $(1)"
-	@ENV=$(1) docker compose --env-file .env.$(1) up -d --build
+	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build
 endef
 
 define compose_down
 	@echo "✅ Removendo todos os containers: $(1)"
-	@ENV=$(1) docker compose --env-file .env.$(1) down
+	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down
 endef
 
 define compose_logs
 	@echo "📜 Logs do ambiente: $(1)"
-	@ENV=$(1) docker compose --env-file .env.$(1) logs -f
+	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) logs -f
 endef
 
 define compose_clean
 	@echo "🧨 Limpando tudo no ambiente: $(1)"
-	@ENV=$(1) docker compose --env-file .env.$(1) down -v --remove-orphans
+	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down -v --remove-orphans
 	@docker image prune -a -f
 	@docker volume prune -f
 	@docker network prune -f
 endef
 
 define compose_up_group
-	@echo "✅ Subindo os containers do grupo: $(1)"
-  @ENV=$(1)	docker compose --env-file .env.$(1) up -d --build $(2)
+	@echo "✅ Subindo os containers do grupo: $(2) no ambiente $(1)"
+	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build $(2)
 endef
+
 
 # ========= COMANDOS POR AMBIENTE ========== #
 
@@ -140,22 +141,13 @@ logs-prod:
 	$(call compose_logs,prod)
 
 bash-db-dev:
-	docker exec -it db-dash-dev bash
+	docker exec -it db-main-dev bash
 
 bash-db-homol:
-	docker exec -it db-dash-homol bash
+	docker exec -it db-main-homol bash
 
 bash-db-prod:
-	docker exec -it db-dash-prod bash
-
-bash-api-dev:
-	docker exec -it api-dash bash
-
-bash-api-homol:
-	docker exec -it api-dash bash
-
-bash-api-prod:
-	docker exec -it api-dash bash
+	docker exec -it db-main-prod bash
 
 # ========= CLEAN (TOTAL WIPE) ========= #
 

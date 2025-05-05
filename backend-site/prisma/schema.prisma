@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TesteBanco {
+model SiteBancoTeste {
   id        Int      @id @default(autoincrement())
   nome      String
   createdAt DateTime @default(now())
