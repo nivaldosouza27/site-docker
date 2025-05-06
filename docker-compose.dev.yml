@@ -3,14 +3,14 @@ networks:
     driver: bridge
 
 services:
-  db-main:
+  mysql-db:
     image: mysql:8.0
-    container_name: db-main-dev
+    container_name: mysql-db
     env_file: ./.env.dev
     ports:
       - "3306:3306"
     volumes:
-      - dbmain-dev-data:/var/lib/mysql
+      - mysql-db-data:/var/lib/mysql
     networks:
       - app_net
 
@@ -18,65 +18,62 @@ services:
     image: phpmyadmin
     container_name: phpmyadmin-dev
     restart: always
+    env_file: ./.env.dev
     ports:
       - "5051:80"
-    environment:
-      PMA_HOST: db-main-dev
-      PMA_USER: root
-      PMA_PASSWORD: root
     depends_on:
-      - db-main
+      - mysql-db
     networks:
       - app_net
 
   backend-dash:
     build:
       context: ./backend-dash
-      dockerfile: ./Docker/Dockerfile.dev
+      dockerfile: Docker/Dockerfile.dev
       args:
-        ENV: dev
+        ENV: .env.dev
     container_name: backend-dash
     ports:
       - "3001:3000"
     depends_on:
-      - db-main
+      - mysql-db
     networks:
       - app_net
 
   backend-manager:
     build:
       context: ./backend-manager
-      dockerfile: ./Docker/Dockerfile.dev
+      dockerfile: Docker/Dockerfile.dev
       args:
-        ENV: dev
+        ENV: .env.dev
     container_name: backend-manager
     ports:
       - "3002:3000"
     depends_on:
-      - db-main
+      - mysql-db
     networks:
       - app_net
 
   backend-site:
     build:
       context: ./backend-site
-      dockerfile: ./Docker/Dockerfile.dev
+      dockerfile: Docker/Dockerfile.dev
       args:
-        ENV: dev
+        ENV: .env.dev
     container_name: backend-site
     ports:
       - "3003:3000"
     depends_on:
-      - db-main
+      - mysql-db
     networks:
       - app_net
 
   front-dash:
     build:
-      context: ./front-dash
-      dockerfile: ./Docker/Dockerfile.dev
+      context: ./front-dash/
+      dockerfile: Docker/Dockerfile.dev
       args:
-        ENV: dev
+        ENV: .env.dev
     container_name: front-dash
     ports:
       - "3020:3000"
@@ -92,9 +89,9 @@ services:
   front-site:
     build:
       context: ./front-site
-      dockerfile: ./Docker/Dockerfile.dev
+      dockerfile: Docker/Dockerfile.dev
       args:
-        ENV: dev
+        ENV: .env.dev
     container_name: front-site
     ports:
       - "3021:3000"
@@ -108,4 +105,4 @@ services:
       - app_net
 
 volumes:
-  dbmain-dev-data:
+  mysql-db-data:

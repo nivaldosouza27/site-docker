@@ -26,22 +26,22 @@ help:
 
 define compose_up
 	@echo "✅ Subindo todos os containers: $(1)"
-	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build
+	@ENV=$(1) docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build
 endef
 
 define compose_down
 	@echo "✅ Removendo todos os containers: $(1)"
-	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down
+	@ENV=$(1) docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down
 endef
 
 define compose_logs
 	@echo "📜 Logs do ambiente: $(1)"
-	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) logs -f
+	@ENV=$(1) docker compose -f docker-compose.$(1).yml --env-file .env.$(1) logs -f
 endef
 
 define compose_clean
 	@echo "🧨 Limpando tudo no ambiente: $(1)"
-	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down -v --remove-orphans
+	@ENV=$(1) docker compose -f docker-compose.$(1).yml --env-file .env.$(1) down -v --remove-orphans
 	@docker image prune -a -f
 	@docker volume prune -f
 	@docker network prune -f
@@ -49,7 +49,7 @@ endef
 
 define compose_up_group
 	@echo "✅ Subindo os containers do grupo: $(2) no ambiente $(1)"
-	@docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build $(2)
+	@ENV=$(1) docker compose -f docker-compose.$(1).yml --env-file .env.$(1) up -d --build $(2)
 endef
 
 
